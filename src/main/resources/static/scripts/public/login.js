@@ -37,7 +37,6 @@ function verSubmit()
     var passwd = $.trim($("#password").val());
     if(uname == "" || uname == null || uname == "您的用户名")
     {
-
         layer.alert("用户名不能为空,请输入用户名!");
         document.getElementById("username").focus();
         return false;
@@ -56,8 +55,7 @@ function verSubmit()
         $("#checkCode").focus();
         return false;
     }
-
-    checkcode(vilidcode);
+    checkUserLogin(uname,passwd,vilidcode);
 
 }
 
@@ -65,16 +63,23 @@ function reloadImg(){
     $("#validateImg").attr("src",$("#validateImg").attr("src").split("?")[0]+"?"+new Date().getTime())
 }
 
-function tologin(){
-    window.location.href="/";
-}
-
-function checkcode(vilidcode){
-    $.get("/checkcode?t="+new Date().getTime(),{checkCode:vilidcode},function(data) {
-        if(data != 1){
-            layer.alert(data);
-        }else{
-            $("#loginForm").submit();
-        }
-    });
+function checkUserLogin(uname,passwd,vilidcode){
+$.ajax({
+    type:'post',
+    cache:false,
+    dataType:"json",
+    url:basepath+'/login/checkUserLogin',
+    data:{
+    checkCode:vilidcode,
+    username:uname,
+    password:passwd
+    },
+    success:function(data) {
+         if(!data.success){
+             layer.alert(data);
+         }else{
+            window.location.href=basepath+"/admin/index";
+         }
+    }
+ });
 }

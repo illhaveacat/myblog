@@ -1,6 +1,7 @@
-package com.stephen.myblog.controller;
+package com.stephen.myblog.controller.manager;
 
 import com.stephen.myblog.common.AjaxResult;
+import com.stephen.myblog.controller.BaseController;
 import com.stephen.myblog.entity.Comment;
 import com.stephen.myblog.mapper.CommentMapper;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
@@ -17,7 +18,7 @@ import java.util.Date;
 
 @Controller
 @RequestMapping("/comment")
-public class CommentController  extends  BaseController{
+public class CommentController  extends BaseController {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="fragments/headcssjs :: headcssjs">
+<head th:include="pages/fragments/headcssjs :: headcssjs">
     <!--这是引用的公共部分-->
 </head>
 <style>
     .text-overflow{overflow: hidden;text-overflow: ellipsis;white-space: nowrap}
 </style>
 <body  class="bg-grey"  gtools_scp_screen_capture_injected="true">
-<header th:include="fragments/header :: header"  id="header" class="header bg-white"></header>
+<header th:include="pages/fragments/header :: header"  id="header" class="header bg-white"></header>
 
 <!-- 页面内容 -->
 <div class="main-content index-page clearfix">
@@ -43,6 +43,6 @@
         <div id="pagecontent" style="text-align: center;"></div>
     </div>
 </div>
-<div th:include="fragments/footer :: footer"></div>
+<div th:include="pages/fragments/footer :: footer"></div>
 </body>
 </html>

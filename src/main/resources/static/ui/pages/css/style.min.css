@@ -500,15 +500,15 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
     display: block;
     width: auto;
     max-width: 50%;
-    height: 22px;
-    margin-top: -10px;
+    height: 100px;
+    margin-top: -40px;
     margin-left: 25px;
     text-decoration: none
 }
 
 .navbar-logo img {
     width: auto;
-    height: 22px;
+    height: 80px;
     outline: 0
 }
 
@@ -1951,7 +1951,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .footer-meta .meta-copyright .info-logo img {
-    height: 32px;
+    height: 80px;
     margin-bottom: 12px
 }
 
