@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
-@RequestMapping(value="/homepage")
+@RequestMapping(value = {"/home.do","/home"})
 public class IndexController extends  BaseController {
 
     private static Logger log = LoggerFactory.getLogger(IndexController.class);
