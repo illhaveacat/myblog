@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="pages/fragments/headcssjs :: headcssjs">
+<!--这是引用的公共部分-->
+</head>
+<body  class="bg-grey"  gtools_scp_screen_capture_injected="true">
+<!--引用公共的header start-->
+<header th:include="pages/fragments/header :: header"  id="header" class="header bg-white"></header>
+<!--引用公共的header end-->
+<!-- 页面内容 -->
+<article class="main-content page-page">
+</article>
+
+<div th:include="pages/fragments/footer :: footer"></div>
+</body>
+</html>

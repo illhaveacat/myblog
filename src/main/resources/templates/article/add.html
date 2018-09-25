@@ -3,7 +3,6 @@
       layout:decorator="fragments/layout">
 <head>
     <title>文章管理</title>
-
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link href="//cdn.bootcss.com/dropzone/4.3.0/min/dropzone.min.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
@@ -108,7 +107,6 @@
 
 
 
-
             </div>
         </article>
     </div>
@@ -116,6 +114,7 @@
 </section>
 
 <div layout:fragment="footerjs">
+    <script type="text/javascript" th:src="@{/ui/lib/jquery/1.9.1/jquery.min.js}"></script>
     <script th:src="@{/ui/lib/mditor/mditor.min.js}"></script>
     <script src="//cdn.bootcss.com/summernote/0.8.2/summernote.min.js"></script>
     <script src="//cdn.bootcss.com/summernote/0.8.2/lang/summernote-zh-CN.min.js"></script>

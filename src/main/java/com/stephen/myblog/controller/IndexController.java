@@ -1,13 +1,18 @@
 package com.stephen.myblog.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.stephen.myblog.common.AjaxResult;
 import com.stephen.myblog.entity.Comment;
 import com.stephen.myblog.entity.Content;
+import com.stephen.myblog.entity.Links;
 import com.stephen.myblog.entity.Metas;
 import com.stephen.myblog.enums.MetaType;
 import com.stephen.myblog.mapper.CommentMapper;
 import com.stephen.myblog.mapper.ContentMapper;
 import com.stephen.myblog.mapper.MetasMapper;
+import com.stephen.myblog.model.Archive;
+import com.stephen.myblog.model.SearchQo;
+import com.stephen.myblog.servcie.SiteService;
 import com.stephen.myblog.util.SystemUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +23,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -38,6 +44,9 @@ public class IndexController extends  BaseController {
     private MetasMapper metasMapper;
     @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    SiteService siteService;
 
     @RequestMapping("/index")
     public String index(ModelMap map, HttpServletRequest req){
@@ -64,7 +73,7 @@ public class IndexController extends  BaseController {
         return this.render("index");
     }
 
-    @RequestMapping(value = "article/{id}")
+    @RequestMapping(value = "/article/{id}")
     public String detail(@PathVariable Long id, ModelMap map){
 
         Content content = contentMapper.getOne(id);
@@ -91,36 +100,6 @@ public class IndexController extends  BaseController {
         return this.render("detail");
     }
 
-    public String convertToString(String categories,List<Metas> cs ){
-        if(StringUtils.isEmpty(categories) ) return "1";
-        String[] arry =  categories.split(",");
-        Map<String ,String > maps = new HashMap<String, String>();
-        for(Metas m :cs){
-            maps.put(String.valueOf(m.getId()),m.getName());
-        }
-
-        StringBuffer sb  = new StringBuffer();
-        for (String s:arry){
-            sb.append(",").append(maps.get(s));
-        }
-
-        return sb.toString().substring(1);
-    }
-    public List<String> toTags(String tags){
-        if(StringUtils.isEmpty(tags)) return null;
-        List<String> ts = new ArrayList<String>();
-        String[] arry = tags.split(",");
-
-        return Arrays.asList(arry);
-    }
-
-
-    public List<Metas> getCategoryMetas(){
-
-        return metasMapper.findByType(MetaType.CATEGORY.getName());
-
-    }
-
     public  String show_categories(HttpServletRequest req,String categories) {
         String basepath = req.getContextPath();
         if (StringUtils.isNotBlank(categories)) {
@@ -135,155 +114,100 @@ public class IndexController extends  BaseController {
         return show_categories(req,"1");
     }
 
-    //生成展示图片
-    public String gen_thumb(Content content){
-        String thumbImg=content.getThumb_img();
-        if(StringUtils.isNotEmpty(thumbImg)){
-            return thumbImg;
-        }
-        String getfirst = SystemUtils.get_first_thumb(content.getContent());
-        if(StringUtils.isEmpty(getfirst)){
-            int cid = Integer.parseInt(String.valueOf(content.getId()));
-            int size = cid % 20;
-            size = size == 0 ? 1 : size;
-            return "/ui/pages/img/rand/" + size + ".jpg";
-        }else {
-            return getfirst;
-        }
-    }
-
-
-
-   /* *//***
+    /**
      * 归档
      * @param map
      * @return
-     *//*
+     */
     @RequestMapping(value = "archives",method = RequestMethod.GET)
     public String archives(ModelMap map){
-
         List<Archive> archives = siteService.getArchivesList();
-
         map.put("archives",archives);
-
         return this.render("archives");
     }
 
-    *//**
-     * 友情链接页面
-     * @param map
-     * @return
-     *//*
+
     @RequestMapping(value = "links",method = RequestMethod.GET)
     public String links(ModelMap map){
-
         List<Links> linksList = siteService.getLinksList();
-
         map.put("links",linksList);
-
         return this.render("links");
     }
 
-    *//**
-     * 关于页面
-     * @param map
-     * @return
-     *//*
 
     @RequestMapping(value = "about",method = RequestMethod.GET)
     public String about(ModelMap map){
         return this.render("about");
     }
-    *//**
-     * 搜索
-     * *//*
+
+
     @RequestMapping(value = "search/{keywords}",method = RequestMethod.GET)
     public String search(HttpServletRequest req, ModelMap map, @PathVariable String keywords) {
-
         Integer page = req.getParameter("page")==null?0:(Integer.parseInt(req.getParameter("page"))-1);
-
         SearchQo sq = new SearchQo();
         sq.setTitle(keywords);
-
         sq.setPage(page);
-        Page<Content> pagecontent = siteService.findContentByKeywords(sq);
-
+        List<Content> contents = siteService.findContentByKeywords(sq);
+        long count=contentMapper.countByKeywords(keywords);
         map.put("keywords",keywords);
-        map.put("totals",pagecontent.getTotalPages());
+        map.put("totals",count);
         map.put("page",page+1);
         map.put("pageflag","search");
         map.put("type","搜索");
         map.put("icons",ICONS);
-        map.put("clists",pagecontent.getContent());
-
+        map.put("clists",contents);
         return this.render("page-category");
     }
 
-
-    *//**
-     * 点击标签进行搜索
-     * *//*
     @RequestMapping(value = "tag/{keywords}",method = RequestMethod.GET)
     public String tag(HttpServletRequest req, ModelMap map, @PathVariable String keywords) {
-
-
         Integer page = req.getParameter("page")==null?0:(Integer.parseInt(req.getParameter("page"))-1);
-
-
         if(StringUtils.isEmpty(keywords)) return "403";
-        Metas metas = metasRepository.findByNameAndType(keywords, MetaType.TAGS.getName());
+        Metas metas = metasMapper.findByNameAndType(keywords, MetaType.TAGS.getName());
         if(metas == null) return "403";
         SearchQo sq = new SearchQo();
         sq.setTag(keywords);
 
         sq.setPage(page);
-        Page<Content> pagecontent = siteService.findContentByTags(sq);
+
+        List<Content> contents = siteService.findContentByTags(sq);
+
+        long count=contentMapper.countByTagsPage(metas.getId());
 
         map.put("keywords",keywords);
-        map.put("totals",pagecontent.getTotalPages());
+        map.put("totals",count);
         map.put("page",page+1);
         map.put("type","标签");
         map.put("pageflag","tag");
         map.put("icons",ICONS);
-        map.put("clists",pagecontent.getContent());
+        map.put("clists",contents);
 
         return this.render("page-category");
     }
-    *//**
-     * 点击分类进行搜索
-     * *//*
+
+
     @RequestMapping(value = "category/{keywords}",method = RequestMethod.GET)
     public String category(HttpServletRequest req, ModelMap map, @PathVariable String keywords) {
-
-
         Integer page = req.getParameter("page")==null?0:(Integer.parseInt(req.getParameter("page"))-1);
-
-
         if(StringUtils.isEmpty(keywords)) return "403";
-        Metas metas = metasRepository.findOne(Long.valueOf(keywords));
+        Metas metas = metasMapper.findOne(Long.valueOf(keywords));
         if(metas == null) return "403";
         SearchQo sq = new SearchQo();
         sq.setCategory(keywords);
-
         sq.setPage(page);
-        Page<Content> pagecontent = siteService.findContentByCategory(sq);
+        List<Content> contents = siteService.findContentByCategory(sq);
+        long count=contentMapper.countByCategoryPage(metas.getId());
 
         map.put("keywords",metas.getName());
         map.put("categoryid",metas.getId());
-        map.put("totals",pagecontent.getTotalPages());
+        map.put("totals",count);
         map.put("page",page+1);
         map.put("type","分类");
         map.put("pageflag","category");
         map.put("icons",ICONS);
-        map.put("clists",pagecontent.getContent());
-
+        map.put("clists",contents);
         return this.render("page-category");
     }
-
-    *//**
-     * 底部最新文章
-     * @return
-     *//*
 
     @RequestMapping(value = "re_articles",method = RequestMethod.GET)
     @ResponseBody
@@ -295,9 +219,11 @@ public class IndexController extends  BaseController {
 
     public List<Metas> getCategoryMetas(){
 
-        return metasRepository.findByType(MetaType.CATEGORY.getName());
+        return metasMapper.findByType(MetaType.CATEGORY.getName());
 
     }
+
+
     public String convertToString(String categories,List<Metas> cs ){
         if(StringUtils.isEmpty(categories) ) return "1";
         String[] arry =  categories.split(",");
@@ -313,6 +239,8 @@ public class IndexController extends  BaseController {
 
         return sb.toString().substring(1);
     }
+
+
     public List<String> toTags(String tags){
         if(StringUtils.isEmpty(tags)) return null;
         List<String> ts = new ArrayList<String>();
@@ -338,27 +266,6 @@ public class IndexController extends  BaseController {
         }
     }
 
-    *//**
-     * 分类的转换显示
-     * @param categories
-     *//*
-    public  String show_categories(HttpServletRequest req, String categories) {
-        String basepath = req.getContextPath();
-        if (StringUtils.isNotBlank(categories)) {
-            String[] arr = categories.split(",");
-            StringBuffer sbuf = new StringBuffer();
-            for (String c : arr) {
-                Metas   m = metasRepository.findOne(Long.valueOf(c));
-                sbuf.append("<a href=\""+basepath+"/pages/category/" +c + "\">" + m.getName() + "</a>");
-            }
-            return sbuf.toString();
-        }
-        return show_categories(req,"1");
-    }
-
-    *//**
-     * 获取最近的文章
-     *//*
     public AjaxResult getRecentArticles(){
 
         Set<Content> contents = new HashSet<Content>();
@@ -367,6 +274,5 @@ public class IndexController extends  BaseController {
 
         return new AjaxResult(contents);
     }
-*/
 
 }

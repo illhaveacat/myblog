@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- *   17/4/13.
- */
 @Service
 public class MetasService {
     @Autowired

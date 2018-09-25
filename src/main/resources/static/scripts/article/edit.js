@@ -111,7 +111,11 @@ function submitform() {
 
     $.ajax({
        type:'post',
-       url:basepath+'/article/save', data:$("#form-add").serialize(),
+       url:basepath+'/article/save',
+//       data:$("#form-add").serialize(),
+       data:{
+        test:"test"
+       },
        success:function (data) {
            if(data == 1){
                location.href=basepath+"/article/index";

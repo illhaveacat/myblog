@@ -5,12 +5,9 @@ $('#tags').tagsInput({
     defaultText: '请输入文章标签'
 });
 $(function(){
-
-
     $(".select2").select2({
         width: '100%'
     });
-
     $("#summernotediv").hide();
     $("#markdowndiv").show();
     mditor = window.mditor = Mditor.fromTextarea(document.getElementById('md-editor'));
@@ -80,13 +77,11 @@ function submitform() {
         layer.alert('请输入文章标题');
         return;
     }
-
     if (!content.trim()) {
         layer.alert('请输入文章内容');
         return;
     }
     $('#content-editor').val(content);
-
     if($('#multiple-sel').val()){
         $("#categorys").val($('#multiple-sel').val());
     }else{
@@ -94,7 +89,8 @@ function submitform() {
     }
     $.ajax({
        type:'post',
-       url:basepath+'/article/save', data:$("#form-add").serialize(),
+       url:basepath+'/article/save',
+       data:$("#form-add").serialize(),
        success:function (data) {
            if(data == 1){
                location.href=basepath+"/article/index";

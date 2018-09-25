@@ -1,6 +1,6 @@
 package com.stephen.myblog.entity;
 
-//
+
 public class Relationships  {
 
     private long id;
