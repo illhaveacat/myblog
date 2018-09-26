@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="pages/fragments/headcssjs :: headcssjs">
+<!--这是引用的公共部分-->
+</head>
+
+<body  gtools_scp_screen_capture_injected="true">
+<!--引用公共的header start-->
+<header th:include="pages/fragments/header :: header"  id="header" class="header bg-white"></header>
+<!--引用公共的header end-->
+<!-- 页面内容 -->
+
+<article class="main-content page-page" th:inline="text">
+    <div class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            <a th:href="@{'/home/article/'+${c.id}}" th:text="${c.title}"></a>
+        </h1>
+        <div class="post-data">
+            <time  itemprop="datePublished">发布于<span th:text="${#dates.format(c.createdate, 'yyyy-MM-dd HH:mm')}"></span> </time>
+            / <span th:text="${c.categories}"></span>
+        </div>
+    </div>
+    <div id="post-content" class="post-content" itemprop="articleBody">
+        <p class="post-tags" >
+            <a th:each="t: ${tags}" th:href="${#httpServletRequest.getContextPath()}+'/home/tag/'+${t}" th:text="${t}">不能取出标签</a>
+        </p>
+
+        <!--<div th:utext="${c.content}"></div>-->
+
+        <p class="post-info">
+            本文由 iwillhavecat 创作,最后编辑时间为:
+            [[${#dates.format(c.createdate, 'yyyy-MM-dd HH:mm')}]]
+        </p>
+        <div id="reader-comment">
+            <div id="comment_submit">
+            <textarea class="comment-content" name="comment-content"
+                      id="comment-content" placeholder="想对作者说点什么"
+                      rows="1" cols="20" style="width:100%;overflow-y:visible;display: block;overflow:hidden;resize:none;border: 1px solid black;border-radius:5px"></textarea>
+                    <br/>
+            昵称：<input id="nickname" name="nickname" placeholder="你的大名" style="border: 1px solid black;border-radius:5px"></input>
+                    <br/>
+            邮箱：<input id="email" name="email" placeholder="你的邮箱" style="border: 1px solid black;border-radius:5px"></input>
+                    <br/>
+                <input type="hidden" id="content-id" value="" th:value="${c.id}"></input>
+                <button type="button" id="comm_subbtn" onclick="subcomment()">提交</button>
+            </div>
+            <div class="history-comment" style="border-top:dashed 1px #999;" th:each="comment:${comments}">
+                <p>
+                    <span style="float:left">[[${comment.nickname}]]</span>：<span th:text="${comment.comment}"></span>
+                    <span  style="float:right;font-size: 12px;color: #999;">([[${#dates.format(comment.commentTime, 'yyyy-MM-dd HH:mm')}]])</span>
+                    <!--<span th:text="${#dates.format(comment.commentTime, 'yyyy-MM-dd HH:mm:ss')}"></span>-->
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</article>
+<script th:inline="javascript">
+    var content = [[${c.content}]];
+    $(".post-tags").after(content);
+</script>
+
+<!--留言内容-->
+<div id="uyan_frame" style="max-width: 700px;padding: 0px 25px 20px; margin: 0 auto;"></div>
+<!--<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2131397"></script>-->
+<script th:src="@{/scripts/article/comment.js}"></script>
+<div  th:include="pages/fragments/detailfooter :: detailfooter"></div>
+</body>
+</html>

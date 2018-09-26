@@ -1,6 +1,5 @@
 package com.stephen.myblog.controller.manager;
 
-import com.stephen.myblog.common.AjaxResult;
 import com.stephen.myblog.entity.Content;
 import com.stephen.myblog.entity.Metas;
 import com.stephen.myblog.entity.Relationships;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,22 +62,15 @@ public class ArticleController {
 
     @RequestMapping("/add")
     public String add(ModelMap map){
-
         List<Metas> categorys = metasMapper.findByType(MetaType.CATEGORY.getName());
         map.put("menu_code","mainarticle");
         map.put("categorys",categorys);
-
         return "article/add";
     }
 
-    @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @ResponseBody
-    public AjaxResult save(HttpServletRequest req){
-
-        String test=req.getParameter("test");
-        log.info("test="+test);
-        return  new AjaxResult("");
-      /*  Content content = null;
+    @RequestMapping(value = "/save")
+    public String save(HttpServletRequest req){
+        Content content = null;
         String id = req.getParameter("id");
         if(StringUtils.isNotEmpty(id)) {
             content = contentMapper.getOne(Long.valueOf(id));
@@ -89,70 +80,59 @@ public class ArticleController {
             content.setCreatedate(new Date());
             content.setModifydate(new Date());
         }
-
-
         String title = req.getParameter("title");
         String content1 = req.getParameter("content");
         String categories = req.getParameter("categories");
         String tags = req.getParameter("tags");
         String fmt_type = req.getParameter("fmt_type");
         String thumb_img = req.getParameter("thumb_img");
-
         content.setTags(tags);
         content.setTitle(title);
         content.setContent(content1);
-
         content.setHits(0);
         content.setStatus("已发布");
         content.setFmt_type(fmt_type);
         content.setCategories(categories);
         content.setThumb_img(thumb_img);
-
-        contentMapper.save(content);
-
+        content.setAuthor_id(1);
+        if(StringUtils.isNotEmpty(id)) {
+            contentMapper.update(content);
+        }else {
+            contentMapper.save(content);
+        }
         //只要标签不为空就进行清空操作
 
         //保存或者更新关联的标签分类
         saveTagsMetas(content.getId(),tags);
         saveCategoryAndContentRelationships(content.getId(),categories);
-
-        return "1";*/
+        return "redirect:/article/index";
     }
 
 
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/delete/{id}")
     @ResponseBody
     public String delete(@PathVariable Long id){
-
         contentMapper.delete(id);
-
         relationshipsMapper.deleteByCid(id);
-
         log.info("删除->id : "+id);
-
         return "1";
     }
 
-    @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable Long id, ModelMap map){
-
         Content one = contentMapper.getOne(id);
         log.info("edit->id : "+id);
-
         List<Metas> categorys = metasMapper.findByType(MetaType.CATEGORY.getName());
         map.put("c",one);
         map.put("menu_code","mainarticle");
         map.put("categorys",categorys);
-
         String categories = one.getCategories();
         if(StringUtils.isEmpty(categories)){
             categories ="0";
         }
         String[] split = categories.split(",");
-
         List<String> strings = Arrays.asList(split);
         map.put("categories",strings);
-
         return "article/edit";
     }
 
@@ -163,7 +143,6 @@ public class ArticleController {
      * @param tags 标签内容以"，"隔开
      */
     public void saveTagsMetas(long cid,String tags){
-
         if(StringUtils.isEmpty(tags) || cid == 0) return;
         String[] tagarry =  tags.split(",");
         relationshipsMapper.deleteByCidAndType(cid,MetaType.TAGS.getName());
@@ -181,8 +160,6 @@ public class ArticleController {
             }else {
                 relationshipsMapper.save(new Relationships(cid,m.getId(),MetaType.TAGS.getName()));
             }
-
-
         }
     }
 
@@ -192,21 +169,16 @@ public class ArticleController {
      * @param categories
      */
     public void saveCategoryAndContentRelationships(long cid,String categories){
-
         if(StringUtils.isEmpty(categories) || cid == 0) return;
         String[] arry =  categories.split(",");
-
         relationshipsMapper.deleteByCidAndType(cid,MetaType.CATEGORY.getName());
-
         for (String s : arry){
             Relationships r = new Relationships(cid,Long.valueOf(s),MetaType.CATEGORY.getName());
             relationshipsMapper.save(r);
-
         }
     }
 
     public List<Metas> getCategoryMetas(){
-
         return metasMapper.findByType(MetaType.CATEGORY.getName());
 
     }
@@ -217,12 +189,10 @@ public class ArticleController {
         for(Metas m :cs){
             maps.put(String.valueOf(m.getId()),m.getName());
         }
-
         StringBuffer sb  = new StringBuffer();
         for (String s:arry){
             sb.append(",").append(maps.get(s));
         }
-
         return sb.toString().substring(1);
     }
 }

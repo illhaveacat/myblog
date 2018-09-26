@@ -121,30 +121,24 @@ public class AdminController {
 
     @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
     public String edit(@PathVariable Long id, ModelMap map){
-
         Content one = contentMapper.getOne(id);
         log.info("edit->id : "+id);
-
         List<Metas> categorys = metasMapper.findByType(MetaType.CATEGORY.getName());
         map.put("c",one);
         map.put("menu_code","mainarticle");
         map.put("categorys",categorys);
-
         String categories = one.getCategories();
         if(StringUtils.isEmpty(categories)){
             categories ="0";
         }
         String[] split = categories.split(",");
-
         List<String> strings = Arrays.asList(split);
         map.put("categories",strings);
-
         return "article/edit";
     }
 
     @RequestMapping("/toUpdatePass")
     public String toUpdatePass(){
-
         return "admin/updatepass";
     }
 
@@ -190,8 +184,6 @@ public class AdminController {
             }else {
                 relationshipsMapper.save(new Relationships(cid,m.getId(),MetaType.TAGS.getName()));
             }
-
-
         }
     }
 

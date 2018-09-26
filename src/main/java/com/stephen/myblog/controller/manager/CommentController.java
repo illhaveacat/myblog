@@ -43,4 +43,21 @@ public class CommentController  extends BaseController {
         return new AjaxResult(true,"保存评论成功",null);
     }
 
+    @RequestMapping(value = "/index",method = RequestMethod.POST)
+    public AjaxResult index(HttpServletRequest req){
+        logger.info("======管理评论=======");
+        String nickname=req.getParameter("nickname");
+        String email=req.getParameter("email");
+        String comment=req.getParameter("comment");
+        long contentId=Long.valueOf(req.getParameter("contentId"));
+        Comment bean=new Comment();
+        bean.setComment(comment);
+        bean.setCommentTime(new Date());
+        bean.setContentId(contentId);
+        bean.setNickname(nickname);
+        bean.setEmail(email);
+        commentMapper.save(bean);
+        return new AjaxResult(true,"保存评论成功",null);
+    }
+
 }
